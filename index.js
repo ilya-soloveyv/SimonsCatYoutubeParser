@@ -9,6 +9,7 @@ const youtubedl = require('youtube-dl')
 const path = require('path')
 const TelegramBot = require('node-telegram-bot-api')
 const bot = new TelegramBot(process.env.TELEGRAM_TOKEN, { polling: true })
+const sec = require('sec')
 const Sequelize = require('sequelize')
 const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASS, {
   host: process.env.DB_HOST,
@@ -27,7 +28,7 @@ var tempVideoData = {}
 var videoId = null
 
 
-new CronJob('*/5 * * * *', function () {
+// new CronJob('*/5 * * * *', function () {
   fetchUrl("https://www.googleapis.com/youtube/v3/search?key=" + process.env.YT_KEY + "&channelId=" + process.env.YT_CHANNEL + "&part=snippet,id&order=date&maxResults=1", function (error, meta, body) {
     var data = JSON.parse(body)
     if (!error) {
@@ -48,13 +49,11 @@ new CronJob('*/5 * * * *', function () {
             })
             video.on('end', () => {
               bot.sendMessage(process.env.TELEGRAM_ADMIN, 'Файл успешно загружен на сервер')
-              console.log(videoId)
               Video.create({
                 yt_channel: process.env.YT_CHANNEL,
                 dateCreate: new Date(),
                 yt_video: videoId
               }).then(() => {
-                console.log(videoId)
                 if (fs.existsSync(tempVideo)) {
                   if (tempVideoData.filesize < 50000000) {
                     bot.sendVideo(process.env.TELEGRAM_CHANNEL, tempVideo, {
@@ -62,6 +61,7 @@ new CronJob('*/5 * * * *', function () {
                       height: tempVideoData.height,
                       file_size: tempVideoData.filesize,
                       caption: tempVideoData.title,
+                      duration: sec(tempVideoData.duration)
                     }).then((data) => {
                       bot.sendMessage(process.env.TELEGRAM_ADMIN, 'Файл размещен на канале')
                       fs.unlink(tempVideo, (err) => {
@@ -92,4 +92,4 @@ new CronJob('*/5 * * * *', function () {
       bot.sendMessage(process.env.TELEGRAM_ADMIN, 'Ошибка обращения к Google API')
     }
   })
-}, null, true, 'America/Los_Angeles')
+// }, null, true, 'America/Los_Angeles')

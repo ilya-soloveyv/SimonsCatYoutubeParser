@@ -26,6 +26,7 @@
     "messaging-api-telegram": "^0.7.11",
     "mysql2": "^1.6.5",
     "node-telegram-bot-api": "^0.30.0",
+    "sec": "^1.0.0",
     "sequelize": "^5.10.1",
     "youtube-dl": "^2.0.0"
   }
