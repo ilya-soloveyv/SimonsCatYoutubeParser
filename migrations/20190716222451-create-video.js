@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('videos', {
+    return queryInterface.createTable('video', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -14,17 +14,12 @@ module.exports = {
       yt_video: {
         type: Sequelize.STRING
       },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      },
-      updatedAt: {
-        allowNull: false,
+      dateCreate: {
         type: Sequelize.DATE
       }
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('videos');
+    return queryInterface.dropTable('video');
   }
 };

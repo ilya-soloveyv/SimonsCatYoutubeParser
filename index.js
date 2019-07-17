@@ -24,6 +24,7 @@ bot.sendMessage(process.env.TELEGRAM_ADMIN, 'Приложение Simon`s Cat Pa
 
 const tempVideo = path.join(__dirname, 'upload/myvideo.mp4')
 var tempVideoData = {}
+var videoId = null
 
 
 new CronJob('*/5 * * * *', function () {
@@ -31,39 +32,50 @@ new CronJob('*/5 * * * *', function () {
     var data = JSON.parse(body)
     if (!error) {
       if (meta.status == 200) {
-        var yt_video = data.items[0].id.videoId
+        videoId = data.items[0].id.videoId
+        console.log(videoId)
         Video.count({
           where: {
-            yt_video: yt_video
+            yt_video: videoId
           }
         }).then((count) => {
           if (count == 0) {
-            var video = youtubedl('http://www.youtube.com/watch?v=' + yt_video, ['--format=18'], {
+            var video = youtubedl('http://www.youtube.com/watch?v=' + videoId, ['--format=18'], {
               cwd: __dirname
             })
             video.on('info', function (info) {
               tempVideoData = info
             })
-            video.on('end', (info) => {
+            video.on('end', () => {
               bot.sendMessage(process.env.TELEGRAM_ADMIN, 'Файл успешно загружен на сервер')
-              Video.insert({
+              console.log(videoId)
+              Video.create({
                 yt_channel: process.env.YT_CHANNEL,
-                yt_video: yt_video
+                dateCreate: new Date(),
+                yt_video: videoId
               }).then(() => {
+                console.log(videoId)
                 if (fs.existsSync(tempVideo)) {
-                  bot.sendVideo(process.env.TELEGRAM_CHANNEL, tempVideo, {
-                    width: tempVideoData.width,
-                    height: tempVideoData.height,
-                    file_size: tempVideoData.filesize,
-                    caption: tempVideoData.title,
-                  }).then((data) => {
-                    bot.sendMessage(process.env.TELEGRAM_ADMIN, 'Файл расмещен на канале')
+                  if (tempVideoData.filesize < 50000000) {
+                    bot.sendVideo(process.env.TELEGRAM_CHANNEL, tempVideo, {
+                      width: tempVideoData.width,
+                      height: tempVideoData.height,
+                      file_size: tempVideoData.filesize,
+                      caption: tempVideoData.title,
+                    }).then((data) => {
+                      bot.sendMessage(process.env.TELEGRAM_ADMIN, 'Файл размещен на канале')
+                      fs.unlink(tempVideo, (err) => {
+                        bot.sendMessage(process.env.TELEGRAM_ADMIN, 'Временный файл удален с сервера')
+                      })
+                    }, error => {
+                      bot.sendMessage(process.env.TELEGRAM_ADMIN, 'Ошибка загрузки видео на канал')
+                    })
+                  } else {
+                    bot.sendMessage(process.env.TELEGRAM_ADMIN, 'Файл превысил 50Мб')
                     fs.unlink(tempVideo, (err) => {
                       bot.sendMessage(process.env.TELEGRAM_ADMIN, 'Временный файл удален с сервера')
                     })
-                  }, error => {
-                    bot.sendMessage(process.env.TELEGRAM_ADMIN, 'Ошибка загрузки видео на канал')
-                  })
+                  }
                 } else {
                   bot.sendMessage(process.env.TELEGRAM_ADMIN, 'Файл не найден на сервере')
                 }
