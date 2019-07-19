@@ -28,7 +28,7 @@ var tempVideoData = {}
 var videoId = null
 
 
-new CronJob('*/5 * * * *', function () {
+new CronJob(process.env.CRON_TIME, function () {
   fetchUrl("https://www.googleapis.com/youtube/v3/search?key=" + process.env.YT_KEY + "&channelId=" + process.env.YT_CHANNEL + "&part=snippet,id&order=date&maxResults=1", function (error, meta, body) {
     var data = JSON.parse(body)
     if (!error) {
