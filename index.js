@@ -47,3 +47,6 @@ if (process.env.NODE_ENV == 'development') {
     Simons.getYoutube()
   }, null, true, 'America/Los_Angeles')
 }
+
+console.log('Server started')
+bot.sendMessage(process.env.TELEGRAM_ADMIN, 'Приложение Simon`s Cat Parser перезапустилось')
