@@ -22,9 +22,9 @@ const sec = require('sec')
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
-const tempVideo = path.join(__dirname, 'upload/myvideo.mp4')
-var tempVideoData = {}
-var videoId = null
+// const tempVideo = path.join(__dirname, 'upload/myvideo.mp4')
+// var tempVideoData = {}
+// var videoId = null
 
 // const Simons = require('./simons')(bot)
 const Simons = require('./simons')(bot)
@@ -43,10 +43,9 @@ if (process.env.NODE_ENV == 'development') {
   // Simons()
 } else {
   new CronJob(process.env.CRON_TIME, function () {
-    bot.sendMessage(process.env.TELEGRAM_ADMIN, 'Приложение Simon`s Cat Parser перезапустилось')
     Simons.getYoutube()
   }, null, true, 'America/Los_Angeles')
 }
 
-console.log('Server Simon`s Cat Parser restarted')
-bot.sendMessage(process.env.TELEGRAM_ADMIN, 'Server Simon`s Cat Parser restarted')
+console.log('Приложение Simon`s Cat Parser перезапустилось')
+bot.sendMessage(process.env.TELEGRAM_ADMIN, 'Приложение Simon`s Cat Parser перезапустилось')
