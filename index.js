@@ -48,5 +48,5 @@ if (process.env.NODE_ENV == 'development') {
   }, null, true, 'America/Los_Angeles')
 }
 
-console.log('Server started')
-bot.sendMessage(process.env.TELEGRAM_ADMIN, 'Приложение Simon`s Cat Parser перезапустилось')
+console.log('Server Simon`s Cat Parser restarted')
+bot.sendMessage(process.env.TELEGRAM_ADMIN, 'Server Simon`s Cat Parser restarted')
